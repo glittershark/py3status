@@ -265,7 +265,7 @@ import datetime
 # API information
 OWM_CURR_ENDPOINT = "https://api.openweathermap.org/data/2.5/weather?"
 OWM_FUTURE_ENDPOINT = "https://api.openweathermap.org/data/2.5/forecast?"
-IP_ENDPOINT = "http://geo.ultrabug.fr"
+IP_ENDPOINT = "http://ifconfig.co/json"
 
 # Paths of information to extract from JSON
 IP_CITY = "//city"
