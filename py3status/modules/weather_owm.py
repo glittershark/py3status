@@ -265,7 +265,6 @@ import datetime
 # API information
 OWM_CURR_ENDPOINT = "https://api.openweathermap.org/data/2.5/weather?"
 OWM_FUTURE_ENDPOINT = "https://api.openweathermap.org/data/2.5/forecast?"
-OWM_ONECALL_ENDPOINT = "https://api.openweathermap.org/data/2.5/onecall?"
 IP_ENDPOINT = "http://geo.ultrabug.fr"
 
 # Paths of information to extract from JSON
@@ -566,12 +565,6 @@ class Py3status:
         weathers = data["list"]
         return weathers[:-1] if self.forecast_include_today else weathers[1:]
 
-    def _get_onecall(self, extras):
-        # Get and process the current weather
-        params = {"appid": self.api_key, "lang": self.lang}
-        extras.update(params)
-        return self._make_req(OWM_ONECALL_ENDPOINT, extras)
-
     def _get_icon(self, wthr):
         # Lookup the icon from the weather code (default sunny)
         return self.icons[self._jpath(wthr, OWM_WEATHER_ICON, 800)]
@@ -800,15 +793,12 @@ class Py3status:
 
         return data
 
-    def _format(self, current_wthr, fcsts, city, country):
+    def _format(self, current_wthr, city, country):
         # Format all sections
         today = self._format_dict(current_wthr, city, country)
 
         # Insert forecasts
         forecasts = []
-        for day in fcsts:
-            future = self._format_dict(day, city, country)
-            forecasts.append(self.py3.safe_format(self.format_forecast, future))
 
         # Give the final format
         format_forecast_separator = self.py3.safe_format(self.format_forecast_separator)
@@ -840,15 +830,8 @@ class Py3status:
             except Exception:
                 raise Exception("no latitude/longitude found for your config")
 
-            # onecall = forecasts
-            onecall_api_params = {"lat": lat, "lon": lon}
-            onecall = self._get_onecall(onecall_api_params)
-            onecall_daily = onecall["daily"]
-
-            fcsts_days = self.forecast_days + 1
             text = self._format(
                 current_wthr,
-                onecall_daily[1:fcsts_days],
                 owm_city,
                 country,
             )
